@@ -1,52 +1,56 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import TodoList from "./components/TodoList";
-import AddTodo from './containers/AddToDo';
-import logo from './logo.svg';
+import { addTodo } from './actions';
+import TodoList from './components/TodoList';
 import './App.css';
 
 class App extends Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.state = {
-      todos: [],
-    }
+      todos: ''
+    };
+    this.addTodo = this.addTodo.bind(this);
+    this.updateNewTodo = this.updateNewTodo.bind(this);
   }
 
-  handleInputChange = e => {
-    this.setState({ [e.target.name]: e.target.value });
-  }
+ addTodo(event) {
+   event.preventDefault();
+   this.props.addTodo({
+     value: this.state.newTodo,
+     complete: false
+   });
+   this.setState({
+     newTodo: ''
+   });
+ }
 
-  addToDo = () => {
-    const { todos } = this.state;
-    const addToDo = {
-      todo: todos,
-      completed: false
-    }
-    this.props.addToDo(addToDo);
-    this.setState({ todos: '' })
-  }
+ updateNewTodo(event) {
+   this.setState({
+     newTodo: event.target.value
+   });
+ }
 
   render() {
     return (
       <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">Welcome to React</h1>
-        </header>
-        
+        <form onSubmit={this.addTodo}>
         <input 
-          onChange={this.handleInputChange} 
-          placeholder = "Enter ToDo"
-          value={this.state.todos} 
-          name="todos"
+          onChange={this.updateNewTodo}
+          placeholder="new todo"
+          value={this.state.newTodo}
         />
-        <button onClick={this.addToDos}>Submit</button>
-        {console.log("PROPS", this.state.todos)};
-        {/* <ToDoList list={this.props.todos}/> */}
+        </form>
+        <TodoList todos={this.props.todos} />
       </div>
     );
   }
 }
 
-export default App;
+const mapStateToProps = (state) => {
+  return {
+    todos: state.todos
+  };
+};
+
+export default connect(mapStateToProps, { addTodo });
