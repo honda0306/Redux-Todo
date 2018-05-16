@@ -1,56 +1,38 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { addTodo } from './actions';
-import TodoList from './components/TodoList';
+import { addTodo, toggleTodo, deleteTodo } from './actions';
+import ToDoList from './components/ToDoList';
 import './App.css';
 
 class App extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      todos: ''
-    };
-    this.addTodo = this.addTodo.bind(this);
-    this.updateNewTodo = this.updateNewTodo.bind(this);
-  }
-
- addTodo(event) {
-   event.preventDefault();
-   this.props.addTodo({
-     value: this.state.newTodo,
-     complete: false
-   });
-   this.setState({
-     newTodo: ''
-   });
- }
-
- updateNewTodo(event) {
-   this.setState({
-     newTodo: event.target.value
-   });
- }
 
   render() {
     return (
       <div className="App">
-        <form onSubmit={this.addTodo}>
-        <input 
-          onChange={this.updateNewTodo}
-          placeholder="new todo"
-          value={this.state.newTodo}
-        />
-        </form>
-        <TodoList todos={this.props.todos} />
+        <ToDoForm />
+        {this.props.todos.map((e, i) => {
+          console.log(e.completed)
+          return (
+            <div key={e.id} className="element">
+              <p className="list-text" style={e.completed ? { textDecoration: "line-through" } : { textDecoration: "none" }}>{e.value} </p>
+              <button className="btn" onClick={() => {
+                this.props.deleteTodo(e.id)
+              }}>Delete</button>
+              <button className="btn" onClick={() => {
+                this.props.completeTodo(e.id)
+              }}>Complete</button>
+            </div>
+          );
+        })}
       </div>
     );
   }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
   return {
-    todos: state.todos
+    todos: todos
   };
 };
 
-export default connect(mapStateToProps, { addTodo });
+export default connect(mapStateToProps, { addTodo, deleteTodo, completeTodo })(App);
